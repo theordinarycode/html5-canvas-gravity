@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity</title>
+    <style>
+        #canvas {
+            border: 1px solid gray;
+            background-color: 'white';
+        }
+
+        container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="canvas" width="400px" height="400px"></canvas>
+
+    <script>
+
+
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext("2d");
+        var gravity = .75;
+        var friction = 0.85;
+        const circleArray = [];
+        let ballArray = [];
+        var ball;
+
+        // const mouse = {
+        //     x: undefined,
+        //     y: undefined
+        // }
+
+        canvas.addEventListener('mousedown',
+            function (event) {
+                ballArray = []
+                init();
+            }
+        )
+
+        canvas.addEventListener('touchdown',
+            function (event) {
+                ballArray = []
+                init();
+            }
+        )
+
+        window.onload = function () {
+            console.log('load')
+            init();
+        };
+
+        const maxRadius = 60;
+        const minRadius = 6;
+
+
+
+        function init() {
+
+            ball = new Ball(canvas.width / 2, canvas.height / 2, 2, 30, 'red')
+            console.log(ball)
+
+            for (let i = 0; i < 300; i++) {
+                let radius = Math.random() * 6 + 1;
+                let x = Math.random() * (canvas.width - radius) + radius;
+                let y = Math.random() * (canvas.height - radius * 4 - 100) + radius;
+                let dx = (Math.random() - 0.5) * 2;
+                let dy = (Math.random() - 0.5) * 2;
+
+                ballArray.push(new Ball(x, y, dx, dy, radius, 'red'))
+            }
+
+            console.log(ballArray)
+        }
+
+        function Ball(x, y, dx, dy, radius, color) {
+            this.x = x;
+            this.y = y;
+            this.dy = dy;
+            this.dx = dx;
+            this.radius = radius;
+            this.color = color;
+
+            this.update = function () {
+                if (this.y + this.radius > canvas.height) {
+                    this.dy = -this.dy * friction;
+                } else {
+                    this.dy += gravity;
+                }
+                if (this.x + this.radius + this.dx > canvas.width || this.x - this.radius < 0) {
+                    this.dx = -this.dx
+                }
+                this.x += this.dx;
+                this.y += this.dy;
+                this.draw()
+            }
+
+            this.draw = function () {
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y - this.dy, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.strokeStyle = 'orange'
+                ctx.fill();
+                ctx.stroke();
+                ctx.closePath();
+            }
+        }
+
+
+        const colorArray = [
+            '#ffaa33', '#99ffaaa', '#00ff00', '#4411aa', '#ff1100',
+        ]
+
+
+        function animate() {
+            requestAnimationFrame(animate)
+            console.log('animate')
+            ctx.clearRect(0, 0, innerWidth, innerHeight)
+            ctx.fillStyle = 'white'
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (var i = 0; i < ballArray.length; i++) {
+                ballArray[i].update()
+            }
+            //ctx.clearRect(0, 0, innerWidth, innerHeight)
+
+        }
+
+        animate()
+
+    </script>
+
+</body>
+
+</html>
